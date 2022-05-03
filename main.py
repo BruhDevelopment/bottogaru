@@ -143,6 +143,33 @@ _<{url}>_''',
         await aiofiles.os.remove(cover_filename)
 
 @bot.command()
+async def dem(ctx):
+    import aiofiles.os    
+    from simpledemotivators import Demotivator
+    
+    if(ctx.message.attachments != [] and ctx.message.content != '?dem'):
+        top_text, bottom_text = ctx.message.content.split('?dem ')[1].split('/')
+        dem = Demotivator(top_text, bottom_text) 
+        dem.create(ctx.message.attachments[0].url, use_url=True, delete_file=True)
+        
+        with open('demresult.jpg', 'rb') as file:
+            await ctx.send(files=[discord.File(file)])
+            
+        if os.path.exists('demresult.jpg'):
+            await aiofiles.os.remove('demresult.jpg')
+    else:
+        await ctx.send(
+            content=f'''Погоди... 
+Ты должен прикрепить пикчу и написать текст в формате `?dem [верхняя строка]/[нижняя строка]`, где "/" - это разделитель
+''')
+    
+    
+@bot.command()
+async def avatar(ctx, member:discord.Member):
+    await ctx.send(member.avatar_url)  
+    
+
+@bot.command()
 async def roll(ctx, dice: str):
     """Rolls a dice in NdN format."""
     try:

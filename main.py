@@ -1,6 +1,7 @@
 import re
 import os
 import discord
+from discord import app_commands
 from discord.ext import commands
 import random
 from pprint import pprint
@@ -10,21 +11,33 @@ try:
     import bot_data as DATA
 except ImportError:
     import bot_local as DATA
-    
-            
 
-description = '''An example bot to showcase the discord.ext.commands extension
-module.
-There are a number of utility commands being showcased here.'''
+from pyChatGPT import ChatGPT
+
+api = ChatGPT(DATA.CHATGPT_TOKEN)
+
+resp = api.send_message('Write an essay on Generative AI')
+print(resp['message'])
 
 intents = discord.Intents.default()
 intents.members = True
+
+client = discord.Client(intents=intents)
+tree = app_commands.CommandTree(client)
 
 bot = commands.Bot(command_prefix='?', description=description, intents=intents)
 
 shiki_request_prev = []
 shiki_is_active = False
 
+@tree.command(name = "commandname", description = "My first application Command", guild=discord.Object(id=1052666851412418671)) #Add the guild ids in which the slash command will appear. If it should be in all, remove the argument, but note that it will take some time (up to an hour) to register the command if it's for all guilds.
+async def first_command(interaction):
+    await interaction.response.send_message("Hello!")
+
+@client.event
+async def on_ready():
+    await tree.sync(guild=discord.Object(id=1052666851412418671))
+    print("Ready!")
 
 @bot.event
 async def on_ready():
@@ -212,5 +225,4 @@ async def _bot(ctx):
     """Is the bot cool?"""
     await ctx.send('Yes, the bot is cool.')
 
-
-bot.run(DATA.TOKEN)
+client.run(DATA.TOKEN)
